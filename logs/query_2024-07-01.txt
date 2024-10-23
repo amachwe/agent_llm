@@ -1,0 +1,9 @@
+
+2024-07-01 17:11:29.340577: None - 
+WITH AuthorBookCounts AS (SELECT a.name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name) SELECT ab.name FROM AuthorBookCounts ab ORDER BY ab.book_count DESC LIMIT 1;
+
+2024-07-01 20:41:34.864400: None - 
+WITH AuthorBookCounts AS (SELECT a.author_id, a.name, COUNT(b.book_id) AS num_books FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.author_id, a.name) SELECT ab.name AS author_name, ab.num_books AS number_of_books FROM AuthorBookCounts ab ORDER BY ab.num_books DESC NULLS LAST LIMIT 1;
+
+2024-07-01 22:07:10.600229: None - 
+WITH TotalBooks AS (SELECT b.author_id, COUNT(b.book_id) AS num_books FROM books b GROUP BY b.author_id) SELECT a.name, tb.num_books FROM TotalBooks tb JOIN authors a ON tb.author_id = a.author_id ORDER BY tb.num_books DESC NULLS LAST LIMIT 1;

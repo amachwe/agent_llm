@@ -1,0 +1,24 @@
+
+2024-06-30 11:56:39.845643: None - 
+SELECT t.tx_id, b.name AS book_name FROM transactions t JOIN books b ON t.book_id = b.book_id;
+
+2024-06-30 12:03:18.166160: None - 
+SELECT t.book_id, t.quantity_sold, to_char(t.sale_date, 'DD-Mon-YYYY') AS sale_date FROM transactions t;
+
+2024-06-30 17:50:12.189171: None - 
+SELECT t.book_id, t.quantity_sold FROM transactions t;
+
+2024-06-30 18:22:28.420525: None - 
+SELECT a.name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name ORDER BY book_count DESC LIMIT 1;
+
+2024-06-30 18:32:52.926763: None - 
+WITH AuthorBookCount AS (SELECT a.name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name) SELECT ab.name FROM AuthorBookCount ab ORDER BY ab.book_count DESC LIMIT 1;
+
+2024-06-30 18:40:27.616783: None - 
+SELECT a.name, COUNT(b.book_id) AS num_books FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name ORDER BY num_books DESC LIMIT 1;
+
+2024-06-30 20:07:38.428362: None - 
+SELECT a.name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name ORDER BY book_count DESC LIMIT 1;
+
+2024-06-30 21:52:26.193057: None - 
+SELECT a.name, COUNT(b.book_id) AS num_books FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name ORDER BY num_books DESC LIMIT 1;

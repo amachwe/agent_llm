@@ -1,0 +1,34 @@
+
+2024-10-11 15:16:28.010476: None - 
+-- Authors
+INSERT INTO authors (author_id, name) VALUES
+('A001', 'Jane Austen'),
+('A002', 'Charles Dickens'),
+('A003', 'Mark Twain');
+
+-- Books
+INSERT INTO books (book_id, name, author_id) VALUES
+('B001', 'Pride and Prejudice', 'A001'),
+('B002', 'Sense and Sensibility', 'A001'),
+('B003', 'Oliver Twist', 'A003'),
+('B004', 'Adventures of Huckleberry Finn', 'A003'),
+('B005', 'David Copperfield', 'A002'),
+('B006', 'A Tale of Two Cities', 'A002'),
+('B007', 'Great Expectations', 'A002');
+
+-- Inventory
+INSERT INTO inventory (inv_id, book_id, quantity) VALUES
+('I001', 'B001', 100),
+('I002', 'B002', 150),
+('I003', 'B003', 200),
+('I004', 'B004', 250),
+('I005', 'B005', 300),
+('I006', 'B006', 350),
+('I007', 'B007', 400);
+
+-- Transactions
+INSERT INTO transactions (tx_id, book_id, quantity_sold, sale_date) VALUES
+('T001', 'B001', 20, '2023-01-15'),
+('T002', 'B002', 30, '2023-01-17'),
+('T003', 'B003', 40, '2023-01-18'),
+('T004', 'B004', 50, '

@@ -1,0 +1,20 @@
+
+2024-08-24 00:17:58.195416: None - Agent llm_agent created
+
+2024-08-24 00:17:58.196419: None - Starting agent... llm_agent
+
+2024-08-24 00:17:58.197416: event_queue_llm_agent_in - Queue Consumer started
+
+2024-08-24 00:18:11.367570: None - Agent llm_agent created
+
+2024-08-24 00:18:11.367570: None - Starting agent... llm_agent
+
+2024-08-24 00:18:11.369446: event_queue_llm_agent_in - Queue Consumer started
+
+2024-08-24 00:20:06.407109: None - Agent llm_agent created
+
+2024-08-24 00:20:06.408109: system_event_queue - Topic Consumer started
+
+2024-08-24 00:20:06.409109: None - Dispatching [{"role": "user", "content": "Hello, how are you?"}] to event_queue_llm_agent_in
+
+2024-08-24 00:20:06.417138: [{"role": "user", "content": "Hello, how are you?"}], tag=PROMPT_EVENT - Sent event_queue_llm_agent_in

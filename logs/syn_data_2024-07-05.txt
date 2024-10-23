@@ -1,0 +1,6 @@
+
+2024-07-05 23:09:35.731268: None - 
+INSERT INTO authors (author_id, name) VALUES ('a1', 'John Smith'), ('a2', 'Jane Doe'), ('a3', 'Bob Brown');
+INSERT INTO books (book_id, name, author_id) VALUES ('b1', 'Book1', 'a1'), ('b2', 'Book2', 'a1'), ('b3', 'Book3', 'a2'), ('b4', 'Book4', 'a2'), ('b5', 'Book5', 'a3'), ('b6', 'Book6', 'a3'), ('b7', 'Book7', 'a1');
+INSERT INTO inventory (inv_id, book_id, quantity) VALUES ('i1', 'b1', 5), ('i2', 'b2', 3), ('i3', 'b3', 4), ('i4', 'b4', 2), ('i5', 'b5', 6), ('i6', 'b6', 8), ('i7', 'b7', 9);
+INSERT INTO transactions (tx_id, book_id, quantity_sold, sale_date) VALUES ('t1', 'b1', 2, '2022-01-01'), ('t2', 'b2', 1, '2022-01-02'), ('t3', 'b3', 3, '2022-01-03'), ('t4', 'b4', 4, '2022-01-04'), ('t5', 'b5', 5, '2022-01-05');

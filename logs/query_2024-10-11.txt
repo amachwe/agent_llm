@@ -1,0 +1,36 @@
+
+2024-10-11 15:17:45.279493: None - 
+SELECT a.name, COUNT(b.book_id) AS number_of_books
+FROM authors a
+JOIN books b ON a.author_id = b.author_id
+GROUP BY a.author_id
+ORDER BY number_of_books DESC
+LIMIT 1;
+```
+
+This query joins the `authors` and `books` tables on the `author_id` column, groups the results by `author_id`, and counts the number of books for each author. The results are then ordered in descending order based on the count of books, and the query limits the output to the author with the highest count.
+
+Here's a breakdown of the query:
+
+- `SELECT a.name, COUNT(b.book_id) AS number_of_books`: Selects the author's name and the count of their books.
+- `FROM authors a JOIN books b ON a.author_id = b.author_id`: Joins the `authors` and `books` tables on the `author_id` column.
+- `GROUP BY a.author_id`: Groups the results by `author_id`.
+- `ORDER BY number_of_books DESC`: Orders the results in descending order based on the count of books.
+- `LIMIT 1`: Limits the output to the author with the highest count of books.
+
+This query will return the name of the author who has written the most books. If there are multiple authors with the same highest count, it will return only one of them. If you want to retrieve all authors with the highest count, you can remove the `LIMIT 1` clause.
+
+Here's an example output:
+
+```
++----------------+-----------------+
+| name           | number_of_books |
++----------------+-----------------+
+| J.K. Rowling   | 12              |
++----------------+-----------------+
+```
+
+This output indicates that J.K. Rowling has written the most books, with a total of 12 books.
+
+<|end_of_text|>
+

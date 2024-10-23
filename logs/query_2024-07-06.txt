@@ -1,0 +1,39 @@
+
+2024-07-06 21:21:33.109938: None - 
+WITH BookCounts AS (SELECT a.name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name) SELECT name, book_count FROM BookCounts ORDER BY book_count DESC LIMIT 1;
+
+2024-07-06 21:22:22.865467: None - 
+WITH TotalSales AS (SELECT b.book_id, SUM(t.quantity_sold) AS total_sales FROM transactions t JOIN books b ON t.book_id = b.book_id GROUP BY b.book_id) SELECT bs.book_id, bs.total_sales FROM TotalSales bs ORDER BY bs.total_sales DESC NULLS LAST LIMIT 5;
+
+2024-07-06 22:01:14.676135: None - 
+SELECT a.name, COUNT(b.book_id) AS number_of_books FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name ORDER BY number_of_books DESC LIMIT 1;
+
+2024-07-06 22:01:50.003222: None - 
+SELECT b.name, SUM(t.quantity_sold) AS total_sales FROM transactions t JOIN books b ON t.book_id = b.book_id GROUP BY b.name ORDER BY total_sales DESC NULLS LAST LIMIT 5;
+
+2024-07-06 22:11:23.500249: None - 
+WITH AuthorBookCount AS (SELECT a.name AS author_name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name) SELECT author_name, book_count FROM AuthorBookCount ORDER BY book_count DESC LIMIT 1;
+
+2024-07-06 22:11:53.858340: None - 
+SELECT t.book_id, SUM(t.quantity_sold) AS total_sales FROM transactions t GROUP BY t.book_id ORDER BY total_sales DESC NULLS LAST LIMIT 5;
+
+2024-07-06 22:12:41.310632: None - 
+WITH total_sales AS (SELECT t.book_id, SUM(t.quantity_sold) AS total_quantity_sold FROM transactions t GROUP BY t.book_id) SELECT b.author_id, ts.total_quantity_sold FROM total_sales ts JOIN books b ON ts.book_id = b.book_id ORDER BY ts.total_quantity_sold DESC LIMIT 1;
+
+2024-07-06 22:24:00.917590: None - 
+WITH AuthorBookCount AS (SELECT a.author_id, a.name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.author_id, a.name) SELECT ab.name, ab.book_count FROM AuthorBookCount ab ORDER BY ab.book_count DESC LIMIT 1;
+
+2024-07-06 22:24:36.212816: None - 
+SELECT b.name, SUM(t.quantity_sold) AS total_sales FROM transactions t JOIN books b ON t.book_id = b.book_id GROUP BY b.name ORDER BY total_sales DESC NULLS LAST LIMIT 5;
+
+2024-07-06 22:25:49.987014: None - 
+WITH TotalSales AS (SELECT b.author_id, SUM(t.quantity_sold) AS total_quantity_sold FROM transactions t JOIN books b ON t.book_id = b.book_id GROUP BY b.author_id), RankedAuthors AS (SELECT a.author_id, a.name, ts.total_quantity_sold, RANK() OVER (ORDER BY ts.total_quantity_sold DESC) AS sales_rank FROM authors a JOIN TotalSales ts ON a.author_id = ts.author_id) SELECT ra.name, ra.total_quantity_sold FROM RankedAuthors ra WHERE ra.sales_rank = 1;
+
+2024-07-06 23:31:40.360427: None - 
+SELECT a.name, COUNT(b.book_id) AS book_count FROM authors a JOIN books b ON a.author_id = b.author_id GROUP BY a.name ORDER BY book_count DESC LIMIT 1;
+
+2024-07-06 23:32:36.842197: None - 
+WITH total_sales AS (SELECT b.book_id, SUM(t.quantity_sold) AS total_quantity_sold FROM transactions t JOIN books b ON t.book_id = b.book_id GROUP BY b.book_id) SELECT b.name, ts.total_quantity_sold FROM total_sales ts JOIN books b ON ts.book_id = b.book_id ORDER BY ts.total_quantity_sold DESC NULLS LAST LIMIT 5;
+
+2024-07-06 23:33:18.055015: None - 
+SELECT a.name, SUM(t.quantity_sold) AS total_sales FROM authors a JOIN books b ON a.author_id = b.author_id JOIN transactions t ON b.book_id = t.book_id GROUP BY a.name ORDER BY total_sales DESC LIMIT 1;

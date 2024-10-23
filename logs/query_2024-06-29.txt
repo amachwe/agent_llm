@@ -1,0 +1,21 @@
+
+2024-06-29 00:05:58.789899: None - 
+SELECT t.book_id, t.quantity_sold FROM transactions t;
+
+2024-06-29 00:55:14.899809: None - 
+SELECT t.book_id, t.quantity_sold, s.sale_date FROM transactions AS t JOIN sales AS s ON t.tx_id = s.tx_id;
+
+2024-06-29 01:51:50.123773: None - 
+SELECT t.tx_id, i.inv_id, b.book_id, b.name AS book_name FROM transactions t JOIN inventory i ON t.book_id = i.book_id JOIN books b ON i.book_id = b.book_id;
+
+2024-06-29 16:42:21.966278: None - 
+SELECT t.book_id, t.quantity_sold FROM transactions t;
+
+2024-06-29 20:58:31.796525: None - 
+SELECT t.tx_id, t.book_id, b.name AS book_name FROM transactions t JOIN books b ON t.book_id = b.book_id;
+
+2024-06-29 21:11:07.902011: None - 
+SELECT t.book_id, b.name AS book_name FROM transactions t JOIN books b ON t.book_id = b.book_id;
+
+2024-06-29 21:18:49.505870: None - 
+SELECT b.name AS book_name, a.name AS author_name FROM books b JOIN authors a ON b.author_id = a.author_id;
