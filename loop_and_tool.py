@@ -97,7 +97,8 @@ if __name__ == "__main__":
 
     client = llm_client.GeminiClient()
 
-    question = "How many users did we have last month?"
+    print("\n\n=========")
+    question = input("Ask your question: ")
 
 
     prompt = f"""
@@ -136,8 +137,8 @@ if __name__ == "__main__":
 
         prompt = f"""{h.concat_input()} Response of tool: {resp} """
  
-    if l == MAX_LOOPS-1:
-        print("Max loops reached. Exiting...")
+        if l == MAX_LOOPS-1:
+            print("Max loops reached. Exiting...")
 
         # response = client.send_request([{"role":"user", "content": prompt}])
         # text = client.extract_response(response)

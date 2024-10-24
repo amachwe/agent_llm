@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     MODEL_ID = "microsoft/Phi-3.5-mini-instruct" #"microsoft/Phi-3-mini-4k-instruct"
 
-    model = transformers.AutoModelForCausalLM.from_pretrained(MODEL_ID, trust_remote_code=True, local_files_only=True)
+    model = transformers.AutoModelForCausalLM.from_pretrained(MODEL_ID, trust_remote_code=True, local_files_only=False)
     tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_ID)
 
     
