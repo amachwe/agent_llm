@@ -1,9 +1,13 @@
 from gen_ai_web_server import llm_client
 import uuid
+import sqlite3
 
 import datetime as dt
 
 class History(object):
+    """
+    The History class is used to store the conversation history and roles of the participants
+    """
 
     def __init__(self, history=[], roles=set()):
         self.history = history
@@ -41,126 +45,139 @@ class History(object):
         self.history = []
         self.roles = set()
 
-
 def execute_sql(query):
-    if "created_at" in query or "date" in query:
-        return "Error"
-    return "1000"
+    #SQL Tool
+    cur = sqlite3.connect(DB_NAME).cursor()
+    try:
+        return execute_query(query, cur)
+    except Exception as e:
+        return f"Error: {e}"
 
 def get_user_response(question):
+    #Ask a Question Tool
     return input(f"Provide response to the question: {question}")
 
-def tool(_input,history):
-    #Execute SQL
+def tool_runner(chat_response):
+    """
+    Select the correct tool based on the input
+    """
+    lines = chat_response.split("\n")
     
-    if "<Q>" in _input and "</Q>" in _input:
-        query = _input.split("<Q>")[1].split("</Q>")[0]
-        result = get_user_response(query)
-        print("Response (CLI Tool):",result)
-        return result
-    elif "<SQL>" in _input and "</SQL>" in _input:
-        query = _input.split("<SQL>")[1].split("</SQL>")[0]
-        result = execute_sql(query)
-        result = f"<RESULT>{result}</RESULT>"
-        print("Response (SQL Tool):",result)
-        return result
-    elif "<R>" in _input and "</R>" in _input:
-        result = _input.split("<R>")[1].split("</R>")[0]
-        print("Are you happy with the answer? ",result)
-        check = input("Enter 'y' or 'n': ")
-        if check == "y":
-            return None
-        else:
-            return "Answer in the response is not correct. Please provide the correct answer."
-    else:
-        raise ValueError(f"Correct tool not found in the input.", {str(input)})
+    for _input in reversed(lines):
+        
+        if "<Q>" in _input and "</Q>" in _input:
+            query = _input.split("<Q>")[1].split("</Q>")[0]
+            result = get_user_response(query)
+            print("\tResponse (Ask A Question Tool): ",result)
+            return result
+        elif "<SQL>" in _input and "</SQL>" in _input:
+            query = _input.split("<SQL>")[1].split("</SQL>")[0]
+            result = execute_sql(query)
+            result = f"<RESULT>{result}</RESULT>"
+            print("\tResponse (SQL Tool):",result)
+            return result
+        elif "<R>" in _input and "</R>" in _input:
+            # Answer the Question Tool
+            result = _input.split("<R>")[1].split("</R>")[0]
+            print("Are you happy with the answer? ",result)
+            check = input("Enter 'y' or 'n': ")
+            if check == "y":
+                return None
+            else:
+                resp = input("How can I help you further?")
+                return f"User needs further help {resp}"
+    
+    raise ValueError(f"Correct tool not found in the input.", {str(input)})
 
-
+def execute_query(query: str, cursor: sqlite3.Cursor)->None:
+   """
+   Execute the SQL query returned by the LLM given an open cursor and print the results
+   """
+   results = ""
+   for line in query.split(";"):
+        if line == "":
+            continue
+        text = line+";"
+        print("Executing: ", text)
+        
+        try:
+          res = cursor.execute(text)
+          for row in res.fetchall():
+                results += str(row) + "\n"
+          return results  
+        except sqlite3.OperationalError as oe:
+          print("Error: ", oe,"\nStatement: ", text)
+          
 
 
 if __name__ == "__main__":
 
-    import os
-    import sqlite3
     ## Configuring the connection and headers
-    DB_NAME = "db/marketplace"
+    DB_NAME = "db/marketplace.db"
 
-    MAX_LOOPS = 10
-
-
-    ## Remove the database if it exists
-    if os.path.exists(DB_NAME):
-      os.remove(DB_NAME)
+    # Maximum number of loops in interaction
+    MAX_LOOPS = 12
 
     ## Create the database and return a cursor to it
     cur = sqlite3.connect(DB_NAME).cursor()
-
     client = llm_client.GeminiClient()
 
-    print("\n\n=========")
+    print("\n\n=========\n")
     question = input("Ask your question: ")
 
+    ddl = """CREATE TABLE users (
+    user_id      INTEGER PRIMARY KEY,
+    name         TEXT    NOT NULL,
+    address      TEXT    NOT NULL,
+    joining_date TEXT    NOT NULL
+);
+
+CREATE TABLE orders (
+    order_id INTEGER PRIMARY KEY,
+    user_id          REFERENCES users (user_id) 
+                     NOT NULL,
+    quantity INTEGER NOT NULL,
+    price    REAL    NOT NULL
+);
+"""
 
     prompt = f"""
     You are an AI assistant that can take one action at a time to help a user with a question: {question}
     You cannot answer without querying for the data. You are allowed to answer without asking a follow up question.
     You can only select ONE action per response. Do not create a SQL query if you do not have enough information.
 
+    Do not repeat the input provided by the user as part of the response.
+
     Use tags below to indicate the action you want to take:
-    ## Run SQL query within the following tags: <SQL> </SQL>. You cannot execute a query - only generate it.
-    ## Ask a follow up question to the user - surround question with tags: <Q> </Q>. 
-    ## If you have enough data to give final answer to the user's question use tags: <R> </R>.
+    ## Run SQL query within the following tags in one line: <SQL> </SQL>. You cannot execute a query - only generate it.
+    ## Ask a follow up question to the user - surround question with tags in one line: <Q> </Q>. 
+    ## If you have enough data to give final answer to the user's question use tags in one line: <R> </R>.
 
-    Additional information:
-
-    Schema for the SQL data: 
-    Table: users
-    columns: user_id, name, email, phone_number, address
-    Table: orders
-    columns: order_id, user_id, product_id, quantity, price
+    Data schema:
+    {ddl}
     """
 
     h = History()
     
     for l in range(MAX_LOOPS):
         
-        h.add(prompt, "user")
+        h.add(prompt, "user") #add input trigger to LLM
         response = client.send_request([{"role":"user", "content": prompt}])
         text = client.extract_response(response)
-        h.add(text, "assistant")
-        print("Response: ", text)
+        h.add(text, "assistant") #add LLM response to history
 
-        resp = tool(text,h)
+        print(f"\n{l} LLM Response: ", text)
+
+        #run the tool
+        resp = tool_runner(text)
         if resp == None:
-            print("Done")
+            print("\n=== Done ===\n")
             break
 
+        # mini prompt to trigger the LLM
         prompt = f"""{h.concat_input()} Response of tool: {resp} """
  
         if l == MAX_LOOPS-1:
             print("Max loops reached. Exiting...")
 
-        # response = client.send_request([{"role":"user", "content": prompt}])
-        # text = client.extract_response(response)
-        # h.add(text, "assistant")
-        # print("\n\nResponse: ", text)
-
-
-        # resp = tool(text,h)
-
-        # prompt = f"""{h.concat_input()} Response of tool: {resp} """
-        # response = client.send_request([{"role":"user", "content": prompt}])
-        # text = response.content #response["response"][1]["content"]
-        # h.add(text, "assistant")
-        # print("\n\nResponse: ", text)
-
-        # #conversation history
-        # #print(h.concat_input())
-        # history = h.concat_input()
-
-        # prompt = f""" Compress the history {history} """
-
-        # response = client.send_request([{"role":"user", "content": prompt}])
-
-        # text = response["response"][1]["content"]
-        # print("\n\nResponse: ", text)   
+        
