@@ -120,7 +120,9 @@ if __name__ == "__main__":
 
     ## Create the database and return a cursor to it
     cur = sqlite3.connect(DB_NAME).cursor()
-    client = llm_client.GeminiClient()
+
+    ## Create the client for LLM
+    client = llm_client.OpenAIClient()
 
     print("\n\n=========\n")
     question = input("Ask your question: ")
