@@ -1,6 +1,7 @@
 from gen_ai_web_server import llm_client
 import uuid
 import sqlite3
+from bs4 import BeautifulSoup
 
 import datetime as dt
 
@@ -45,6 +46,21 @@ class History(object):
         self.history = []
         self.roles = set()
 
+def select_persona(message:str)->str:
+
+    if message == "DBA":
+        return "DBA Prompt"
+    elif message == "":
+
+def get_time_date(message):
+    return f"<RESPONSE>{dt.datetime.now()}</RESPONSE>"
+
+def send_message(message):
+    _client = llm_client.Client()
+    response = _client.send_request([{"role": "user", "content": message}])
+    print(">>",response)
+    return "<RESPONSE>"+_client.extract_response(response)+"</RESPONSE>"
+
 def execute_sql(query):
     #SQL Tool
     cur = sqlite3.connect(DB_NAME).cursor()
@@ -61,31 +77,51 @@ def tool_runner(chat_response):
     """
     Select the correct tool based on the input
     """
-    lines = chat_response.split("\n")
+    soup = BeautifulSoup(chat_response,'lxml')
+    q = soup.find_all("q")
+    s = soup.find_all("sql")
+    r = soup.find_all("r")
+    t = soup.find_all("t")
+    f = soup.find_all("f")
+    p = soup.find_all("p")
     
-    for _input in reversed(lines):
+    # lines = chat_response.split("\n")
+    
+    # for _input in reversed(lines):
         
-        if "<Q>" in _input and "</Q>" in _input:
-            query = _input.split("<Q>")[1].split("</Q>")[0]
-            result = get_user_response(query)
-            print("\tResponse (Ask A Question Tool): ",result)
-            return result
-        elif "<SQL>" in _input and "</SQL>" in _input:
-            query = _input.split("<SQL>")[1].split("</SQL>")[0]
-            result = execute_sql(query)
-            result = f"<RESULT>{result}</RESULT>"
-            print("\tResponse (SQL Tool):",result)
-            return result
-        elif "<R>" in _input and "</R>" in _input:
-            # Answer the Question Tool
-            result = _input.split("<R>")[1].split("</R>")[0]
-            print("Are you happy with the answer? ",result)
-            check = input("Enter 'y' or 'n': ")
-            if check == "y":
-                return None
-            else:
-                resp = input("How can I help you further?")
-                return f"User needs further help {resp}"
+    if q:
+        query = q[0].text
+        result = get_user_response(query)
+        print("\tResponse (Ask A Question Tool): ",result)
+        return result
+    elif s:
+        query = s[0].text
+        result = execute_sql(query)
+        result = f"<RESULT>{result}</RESULT>"
+        print("\tResponse (SQL Tool):",result)
+        return result
+    elif r:
+        # Answer the Question Tool
+        result = r[0].text
+        print("Are you happy with the answer? ",result)
+        check = input("Enter 'y' to Exit or 'n' to continue: ")
+        if check == "y":
+            return None
+        else:
+            resp = input("How can I help you further?")
+            return f"User needs further help {resp}"
+    elif t:
+        result = t[0].text
+        response = get_time_date(result)
+        print("\tResponse (Clock Tool):",response)
+        return response
+    
+    elif f:
+        result = f[0].text
+        response = f"Reflect upon this statement: {result}"
+        print("\tResponse (Reflection Tool):",response)
+        return response
+            
     
     raise ValueError(f"Correct tool not found in the input.", {str(input)})
 
@@ -122,7 +158,7 @@ if __name__ == "__main__":
     cur = sqlite3.connect(DB_NAME).cursor()
 
     ## Create the client for LLM
-    client = llm_client.OpenAIClient()
+    client = llm_client.GeminiClient()
 
     print("\n\n=========\n")
     question = input("Ask your question: ")
@@ -154,6 +190,7 @@ CREATE TABLE orders (
     ## Run SQL query within the following tags in one line: <SQL> </SQL>. You cannot execute a query - only generate it.
     ## Ask a follow up question to the user - surround question with tags in one line: <Q> </Q>. 
     ## If you have enough data to give final answer to the user's question use tags in one line: <R> </R>.
+    ## You can ask for help with finding current time and date using: <T> </T>.
 
     Data schema:
     {ddl}

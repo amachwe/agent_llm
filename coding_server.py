@@ -5,9 +5,10 @@ if __name__ == "__main__":
 
     import transformers
 
-    MODEL_ID = "microsoft/Phi-3.5-mini-instruct" #"microsoft/Phi-3-mini-4k-instruct"
-
-    model = transformers.AutoModelForCausalLM.from_pretrained(MODEL_ID, trust_remote_code=True, local_files_only=True)
+    #MODEL_ID = "microsoft/Phi-3.5-mini-instruct"  
+    MODEL_ID = "microsoft/Phi-4-mini-instruct"
+    #MODEL_ID = "microsoft/phi-4"
+    model = transformers.AutoModelForCausalLM.from_pretrained(MODEL_ID, trust_remote_code=True, local_files_only=False)
     tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_ID)
 
     
